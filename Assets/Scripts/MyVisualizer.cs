@@ -19,18 +19,16 @@ namespace MediaPipe.FaceMesh
         [Space]
         [SerializeField] Shader _maskShader = null;
         [SerializeField] Shader _cropShader = null;
-        [SerializeField] Shader _shader = null;
-        [SerializeField] ComputeShader _eyeLandmarks = null;
         [Space]
-        [SerializeField] MeshFilter meshFilter;
+        [SerializeField] DrawLandmarksToMesh _drawLandmarksToMesh = null;
+
         #endregion
 
         #region Private members
 
         FacePipeline _pipeline;
-        Material _crop, _mask, _material;
+        Material _crop, _mask;
         RenderTexture _croppedEyeRT, _maskedEyeRT;
-        Mesh mesh;
 
         #endregion
 
@@ -43,14 +41,12 @@ namespace MediaPipe.FaceMesh
             //Material初期化
             _mask = new Material(_maskShader);
             _crop = new Material(_cropShader);
-            _material = new Material(_shader);
+            
 
             //RenderTexture確保
             _croppedEyeRT = new RenderTexture(256, 256, 0);
             _maskedEyeRT = new RenderTexture(1024, 1024, 0);
 
-            mesh = meshFilter.mesh;
-            mesh.SetIndices(mesh.GetIndices(0), MeshTopology.LineStrip, 0);
         }
 
         void OnDestroy()
@@ -71,84 +67,26 @@ namespace MediaPipe.FaceMesh
             //シェーダーに変換行列を適用
             _crop.SetMatrix("_Xform", _pipeline.RightEyeCropMatrix);
 
-            //_mask.SetMatrix("_Xform", _pipeline.RightEyeCropMatrix);
-
             //maskシェーダーに頂点を設定
             _mask.SetBuffer("_Vertices", _pipeline.RawRightEyeVertexBuffer);
 
             //webcamTextureを、_cropシェーダーを通して、RenderTextureに描画する
             Graphics.Blit(_webcam.Texture, _croppedEyeRT, _crop);
 
-            Graphics.Blit(_webcam.Texture, _maskedEyeRT, _mask);
+            //cropされたTextureを、_maskシェーダーを通して、RenderTextureに描画する
+            Graphics.Blit(_croppedEyeRT, _maskedEyeRT, _mask);
 
             //RawImageにRenderTextrueを反映
-            //if (_pipeline.IsFaceTracking)
-            {
-               _rightEyeUI.texture = _croppedEyeRT;
-            }
-            ///else
-            {
-            //    _rightEyeUI.texture = null;
-            }
-            //Debug.Log(_pipeline.RawRightEyeVertexBuffer.count);
-
-            _rightEyeDebug.texture = _maskedEyeRT;
+            _rightEyeUI.texture = _maskedEyeRT;
 
 
-            //buffer初期化
-            ComputeBuffer vertexBuffer = _pipeline.RawRightEyeVertexBuffer;
+            //_drawLandmarksToMesh.DrawEye(_pipeline.RawRightEyeVertexBuffer, _pipeline.CroppedRightEyeTexture);
 
-            //computebufferから頂点データ取得してcomputeShaderに渡す
-            _eyeLandmarks.SetBuffer(0, "Vertecies", vertexBuffer);
-            //処理実行
-            _eyeLandmarks.Dispatch(0, 1, 1, 1);
+            //_drawLandmarksToMesh.DrawEye(_pipeline.RawLeftEyeVertexBuffer, _pipeline.CroppedLeftEyeTexture);
 
-            //処理結果にアクセス
-            float4[] vertexData = new float4[vertexBuffer.count];
-
-            vertexBuffer.GetData(vertexData);
-
-            //頂点を描画
-            List<Vector3> meshVert = new List<Vector3>();
-
-            foreach (float4 vertex in vertexData)
-            {
-                meshVert.Add(vertex.xyz);
-            }
-
-            mesh.SetVertices(meshVert);
-
-            foreach (var vert in mesh.vertices)
-            {
-                Debug.Log(vert);
-            }
-
-            //_material.SetBuffer("_Vertices", _pipeline.RawRightEyeVertexBuffer);
-
-            //Graphics.DrawMesh(mesh, transform.position, transform.rotation, _material, 0);
-
-
-            //Debug.Log(_pipeline.RawRightEyeVertexBuffer.GetData)
-
-            meshFilter.GetComponent<Renderer>().material = new Material(_mask);
-
-            _mask.SetBuffer("_Vertices", _pipeline.RawRightEyeVertexBuffer);
-
-
-           // var mv = float4x4.Translate(math.float3(-0.875f, -0.5f, 0));
-          //  _material.SetBuffer("_Vertices", _pipeline.RefinedFaceVertexBuffer);
-          //  Graphics.DrawMesh(_resources.faceLineTemplate, mv, _material, 0);
+            _drawLandmarksToMesh.DrawFace(_pipeline.RawFaceVertexBuffer, _pipeline.CroppedFaceTexture);
 
             #endregion
-        }
-
-        void OnRenderObject()
-        {
-            // Main view overlay
-/*            var mv = float4x4.Translate(math.float3(-0.875f, -0.5f, 0));
-            _material.SetBuffer("_Vertices", _pipeline.RefinedFaceVertexBuffer);
-            _material.SetPass(1);
-            Graphics.DrawMeshNow(_resources.faceLineTemplate, mv);*/
         }
     }
 

@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace MediaPipe.FaceMesh
 {
     public class EyeContourMesh : MonoBehaviour
     {
+
+        [SerializeField] Shader _shader;
         Mesh _mesh;
         Material _material;
 
@@ -29,9 +32,7 @@ namespace MediaPipe.FaceMesh
         void Start()
         {
 
-            Shader shader = Shader.Find("Hidden/MediaPipe/FaceMesh/EyeContourMesh");
-
-            _material = new Material(shader);
+            _material = new Material(_shader);
 
             _mesh = new Mesh();
 
@@ -70,10 +71,26 @@ namespace MediaPipe.FaceMesh
       
         public void UpdateMesh(ComputeBuffer vertexBuffer)
         {
-            _material.SetBuffer("_Vertices", vertexBuffer);
+            try
+            {
+                _material.SetBuffer("_Vertices", vertexBuffer);
+            }
+            catch
+            {
+
+            }
         }
 
-        public void Draw(Texture texture)
+        public void UpdateMesh(ComputeBuffer vertexBuffer, float4x4 cropMatrix)
+        {
+            var fF = MathUtil.ScaleOffset(1f, math.float2(0f, 0f));
+            cropMatrix = math.mul(fF, cropMatrix);
+
+            _material.SetMatrix("_Xform", cropMatrix);
+            UpdateMesh(vertexBuffer);
+        }
+
+            public void Draw(Texture texture)
         {
             _material.SetTexture("_MainTex", texture);
             

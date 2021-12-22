@@ -7,30 +7,38 @@ namespace MediaPipe.FaceMesh
 
     public class FaceMeshTransformed : MonoBehaviour
     {
+        [SerializeField] Shader _transformShader;
         [SerializeField] ResourceSet _resource;
+        [SerializeField] Camera _camera = null;
 
         Mesh _mesh;
         Material _material;
 
         void Start()
         {
-            Shader transformShader = Shader.Find("Hidden/MediaPipe/FaceMesh/FaceTextureTransform");
 
-            _material = new Material(transformShader);
+            _material = new Material(_transformShader);
 
             _mesh = _resource.faceMeshTemplate;
         }
 
         public void UpdateMesh(ComputeBuffer vertexBuffer)
         {
-            _material.SetBuffer("_Vertices", vertexBuffer);
+            try
+            {
+                _material.SetBuffer("_Vertices", vertexBuffer);
+            }
+            catch
+            {
+
+            }
         }
 
         public void Draw(Texture texture)
         {
             _material.SetTexture("_MainTex", texture);
 
-            Graphics.DrawMesh(_mesh, transform.position, transform.rotation, _material, 0);
+            Graphics.DrawMesh(_mesh, transform.position, transform.rotation, _material, 0, _camera);
         }
     }
 }

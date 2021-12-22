@@ -10,12 +10,7 @@ namespace MediaPipe.FaceMesh
     {
         #region Editable attributes
 
-        [SerializeField] WebcamInput _webcam = null;
-        [Space]
-        [SerializeField] ResourceSet _resources = null;
-        [Space]
-        [SerializeField] UI.RawImage _webCamUI = null;
-        [Space]
+        [SerializeField] PipeLineManager _pipeline = null;
         [SerializeField] FaceMesh _faceMesh = null;
         [SerializeField] FaceMeshTransformed _faceMeshTransformed = null;
         [SerializeField] EyeContourMesh _rightEyeContourMesh = null;
@@ -25,9 +20,6 @@ namespace MediaPipe.FaceMesh
 
         #region Private members
 
-        FacePipeline _pipeline;
-
-        RenderTexture _webCamViewRT;
 
         #endregion
 
@@ -35,39 +27,51 @@ namespace MediaPipe.FaceMesh
 
         void Start()
         {
-            _pipeline = new FacePipeline(_resources);
-
-            _webCamViewRT = new RenderTexture(1024, 1024, 0);
+           
         }
 
         void OnDestroy()
         {
-            _pipeline.Dispose();
+           
         }
 
         void LateUpdate()
         {
-            // Processing on the face pipeline
-            _pipeline.ProcessImage(_webcam.Texture);
-
             //Update and draw mesh
-            _rightEyeContourMesh.UpdateMesh(_pipeline.RawRightEyeVertexBuffer);
+            try
+            {
+                _rightEyeContourMesh.UpdateMesh(_pipeline.RawRightEyeVertexBuffer, _pipeline.RightEyeCropMatrix);
 
-            _rightEyeContourMesh.Draw(_pipeline.CroppedRightEyeTexture);
+                _rightEyeContourMesh.Draw(_pipeline.CroppedRightEyeTexture);
+            }
 
-            _leftEyeContourMesh.UpdateMesh(_pipeline.RawLeftEyeVertexBuffer);
+            catch { }
 
-            _leftEyeContourMesh.Draw(_pipeline.CroppedLeftEyeTexture);
+            try
+            {
+                _leftEyeContourMesh.UpdateMesh(_pipeline.RawLeftEyeVertexBuffer, _pipeline.LeftEyeCropMatrix);
 
-            _faceMesh.UpdateMesh(_pipeline.RawFaceVertexBuffer);
+                _leftEyeContourMesh.Draw(_pipeline.CroppedLeftEyeTexture);
+            }
 
-            _faceMesh.Draw(_pipeline.CroppedFaceTexture);
+            catch { }
 
-            _faceMeshTransformed.UpdateMesh(_pipeline.RawFaceVertexBuffer);
+            try
+            {
+                _faceMesh.UpdateMesh(_pipeline.RawFaceVertexBuffer, _pipeline.FaceCropMatrix);
 
-            _faceMeshTransformed.Draw(_pipeline.CroppedFaceTexture);
+                _faceMesh.Draw(_pipeline.CroppedFaceTexture);
+            }
+            catch { }
 
-            _webCamUI.texture = _webcam.Texture;
+            try
+            {
+                _faceMeshTransformed.UpdateMesh(_pipeline.RawFaceVertexBuffer);
+
+                _faceMeshTransformed.Draw(_pipeline.CroppedFaceTexture);
+            }
+
+            catch { }
 
             #endregion
         }

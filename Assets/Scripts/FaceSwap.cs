@@ -12,6 +12,7 @@ namespace MediaPipe.FaceMesh
         [SerializeField] PipeLineManager _pipeline = null;
         [SerializeField] FaceMesh _faceMesh = null;
         [SerializeField] FaceMeshTransformed _faceMeshTransformed = null;
+        [SerializeField] FaceMeshMixed _faceMeshMixed = null;
 
         [SerializeField] RenderTexture _faceUVMappedRT = null;
         [SerializeField] RenderTexture _faceSwappedRT = null;
@@ -20,7 +21,8 @@ namespace MediaPipe.FaceMesh
         [SerializeField] Vector2Int splitNum;
         [Space]
         [SerializeField] Texture[] splitFaces;
-        
+        [Space]
+        [SerializeField] Texture2D faceTexture, faceTexture2;
 
         CompositeTexture _composite;
 
@@ -45,6 +47,8 @@ namespace MediaPipe.FaceMesh
 
             //RenderTextureにFaceTextureを書き込み
             _faceMeshTransformed.Draw(_pipeline.CroppedFaceTexture);
+
+            _faceMeshMixed.Draw(faceTexture);
 
             //renderTextureと取り込んだテクスチャを合成;
             Graphics.CopyTexture(_faceUVMappedRT, _faceSwappedRT);

@@ -1,11 +1,11 @@
 ﻿<Properties StartupConfiguration="{BBF7FAA5-C220-0EFA-82BB-F264D58CF59E}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/FaceSwap.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/FaceMeshMixed.cs">
     <Files>
       <File FileName="Assets/NatSuite/NatDevice/README.md" Line="1" Column="1" />
       <File FileName="Assets/Scripts/FaceMeshTransformed.cs" Line="10" Column="38" />
       <File FileName="Assets/Scripts/FaceMesh.cs" />
       <File FileName="Assets/Scripts/PipeLineManager.cs" Line="87" Column="27" />
-      <File FileName="Assets/Scripts/FaceSwap.cs" Line="51" Column="1" />
+      <File FileName="Assets/Scripts/FaceSwap.cs" Line="65" Column="60" />
       <File FileName="Assets/FaceMesh/Script/FacePipeline_Public.cs" Line="69" Column="18" />
       <File FileName="Assets/FaceMesh/Script/FacePipeline_Base.cs" />
       <File FileName="Assets/FaceMesh/Script/IndexTable.cs" />
@@ -26,8 +26,8 @@
       <File FileName="Library/PackageCache/jp.keijiro.mediapipe.blazeface@1.1.1/Script/FaceDetector.cs" Line="36" Column="17" />
       <File FileName="Assets/Shader/FaceTextureTransform.shader" Line="33" Column="15" />
       <File FileName="Assets/Shader/FaceMeshUVMapped.shader" Line="34" Column="18" />
-      <File FileName="Assets/Scripts/FaceMeshMixed.cs" Line="55" Column="55" />
-      <File FileName="Assets/Shader/FaceTextureMix.shader" Line="57" Column="33" />
+      <File FileName="Assets/Scripts/FaceMeshMixed.cs" Line="40" Column="105" />
+      <File FileName="Assets/Shader/FaceTextureMix.shader" Line="60" Column="44" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.ItemProperties.Assembly-CSharp-Editor PreferredExecutionTarget="fb4baa64-5138-4f32-8541-e00fdf58468d" />

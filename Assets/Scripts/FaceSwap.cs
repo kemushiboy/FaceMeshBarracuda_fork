@@ -22,7 +22,7 @@ namespace MediaPipe.FaceMesh
         [Space]
         [SerializeField] Texture[] splitFaces;
         [Space]
-        [SerializeField] Texture2D faceTexture, faceTexture2;
+        [SerializeField] List<Texture> faceTextures;
 
         CompositeTexture _composite;
 
@@ -62,7 +62,12 @@ namespace MediaPipe.FaceMesh
             //合成結果をメッシュ上に描画
             _faceMesh.Draw(_faceSwappedRT);
 
-            _faceMeshMixed.Draw(faceTexture, faceTexture2);
+            //リアルタイム画像を取り込み
+            faceTextures[0] = _faceUVMappedRT;
+
+            //faceMeshMixed描画
+            _faceMeshMixed.Draw(faceTextures.ToArray());
+
         }
 
         //todo Textureをランダムに入れ替える

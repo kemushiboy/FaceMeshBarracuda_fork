@@ -15,12 +15,12 @@ namespace MediaPipe.FaceMesh
 
         [SerializeField] RenderTexture _faceUVMappedRT = null;
         [SerializeField] RenderTexture _faceSwappedRT = null;
-        //[SerializeField] Texture _swapFaceTexture = null;
-        //[SerializeField] Material _material = null;
-        //[SerializeField] Material _material2 = null;
-        [SerializeField] Texture _texture0_1 = null;
-        [SerializeField] Texture _texture1_0 = null;
-        [SerializeField] Texture _texture1_1 = null;
+
+        [Space]
+        [SerializeField] Vector2Int splitNum;
+        [Space]
+        [SerializeField] Texture[] splitFaces;
+        
 
         CompositeTexture _composite;
 
@@ -28,6 +28,12 @@ namespace MediaPipe.FaceMesh
         void Start()
         {
             _composite = new CompositeTexture();
+        }
+
+        private void OnDestroy()
+        {
+            _faceUVMappedRT.Release();
+            _faceSwappedRT.Release();
         }
 
         // Update is called once per frame
@@ -43,24 +49,35 @@ namespace MediaPipe.FaceMesh
             //renderTextureと取り込んだテクスチャを合成;
             Graphics.CopyTexture(_faceUVMappedRT, _faceSwappedRT);
 
-            _composite.Composite(_faceSwappedRT, _texture0_1, 0, 0.5f, 0.5f, 1);
-            _composite.Composite(_faceSwappedRT, _texture1_0, 0.5f, 1f, 0, 0.5f);
-            _composite.Composite(_faceSwappedRT, _texture1_1, 0.5f, 1, 0.5f, 1);
+            int index = 0;
+            
+            foreach(Texture splitFace in splitFaces)
+            {
+                _composite.Composite(_faceSwappedRT, splitFace, splitNum.y,splitNum.x,index);
+                index++;
+            }
 
             //合成結果をメッシュ上に描画
             _faceMesh.Draw(_faceSwappedRT);
         }
 
+        //todo Textureをランダムに入れ替える
+        public void SelectTexture()
+        {
+
+        }
+
         public void SaveTexture()
         {
-            System.DateTime UnixEpoch = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
-            long now = (long)(System.DateTime.Now - UnixEpoch).TotalSeconds;
+            //System.DateTime UnixEpoch = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            //  long now = (long)(System.DateTime.Now - UnixEpoch).TotalSeconds;
 
-            string filePath = "Assets/" + now + ".png";
-            Debug.Log(filePath);
-            TextureController.SaveImage(_faceUVMappedRT, filePath);
+            //  string filePath = "Assets/" + now + ".png";
+            //  Debug.Log(filePath);
+            //  TextureController.SaveImage(_faceUVMappedRT, filePath);
 
-
+            Texture2D[] splitTexture = TextureController.Split(_faceUVMappedRT, splitNum.y, splitNum.x);
+            TextureController.SaveImages(splitTexture, "Assets/SplitFaces");
         }
     }
 }

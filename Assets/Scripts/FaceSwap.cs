@@ -48,8 +48,6 @@ namespace MediaPipe.FaceMesh
             //RenderTextureにFaceTextureを書き込み
             _faceMeshTransformed.Draw(_pipeline.CroppedFaceTexture);
 
-            _faceMeshMixed.Draw(faceTexture);
-
             //renderTextureと取り込んだテクスチャを合成;
             Graphics.CopyTexture(_faceUVMappedRT, _faceSwappedRT);
 
@@ -63,6 +61,8 @@ namespace MediaPipe.FaceMesh
 
             //合成結果をメッシュ上に描画
             _faceMesh.Draw(_faceSwappedRT);
+
+            _faceMeshMixed.Draw(faceTexture, faceTexture2);
         }
 
         //todo Textureをランダムに入れ替える

@@ -53,12 +53,11 @@ Shader "Hidden/MediaPipe/FaceMesh/FaceTextureMix"
                 o.vertex = float4(v.uv,0,1);
 
                 float2 uv;
-                if(v.vid < 180)
-                    uv = float2( o.vertex.x/2, o.vertex.y);
-                else
-                    uv = float2(0.5+ o.vertex.x/2, o.vertex.y);
+                uv = o.vertex.xy;
 
                 o.uv = TRANSFORM_TEX(uv, _MainTex);
+
+                o.vertex = mul(t,o.vertex);
 
                  o.vertex = UnityObjectToClipPos(o.vertex);
                 return o;

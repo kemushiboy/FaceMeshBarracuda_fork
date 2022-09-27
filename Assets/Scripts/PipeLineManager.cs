@@ -91,7 +91,7 @@ namespace MediaPipe.FaceMesh
         void LateUpdate()
         {
             // Processing on the face pipeline
-            _pipeline.ProcessImage(_inputTexture);
+          //  _pipeline.ProcessImage(_inputTexture);
 
         }
 

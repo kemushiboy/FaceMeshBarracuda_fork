@@ -8,7 +8,7 @@ public class TextureController
 {
     public CapturedDataManager _capturedDataManager { get; private set; }
 
-    public float _texturePercentage = 2f / 3f;
+    public float _texturePercentage = 2.0f / 3.0f;
 
     public  TextureController()
     {
@@ -30,7 +30,7 @@ public class TextureController
         }
 
         int index = 0;
-
+        
         foreach (byte[] rawData in bytesList)
         {
             //テクスチャのバイト化と保存
@@ -47,6 +47,7 @@ public class TextureController
 
         //Jsonに保存
         _capturedDataManager.UpdateJSON();
+        
     }
 
     //todo 戻り値をImageData[]にする

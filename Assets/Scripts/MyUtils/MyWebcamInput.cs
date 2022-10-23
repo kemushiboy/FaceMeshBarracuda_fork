@@ -15,7 +15,9 @@ namespace MediaPipe.FaceMesh
 
         [SerializeField] Texture2D _dummyImage = null;
 
-        [SerializeField] uint defaultDeviceIndex;
+        [SerializeField] bool _isMirror = true;
+
+        [SerializeField] JsonSettings _jsonSettings;
 
         #endregion
 
@@ -36,6 +38,8 @@ namespace MediaPipe.FaceMesh
 
         CameraDevice device;
 
+        string defaultDeviceID;
+
         #region MonoBehaviour implementation
 
         async void Start()
@@ -48,8 +52,28 @@ namespace MediaPipe.FaceMesh
                 Debug.LogError("User did not grant camera permissions");
                 return;
             }
+
+            //load from Json
+            _isMirror = _jsonSettings._settings.isMirrored;
+
+            defaultDeviceID = _jsonSettings._settings.deviceID;
+
             // Create a device query for device cameras
-            query = new MediaDeviceQuery(MediaDeviceCriteria.FrontCamera);
+            query = new MediaDeviceQuery(MediaDeviceCriteria.CameraDevice);
+
+            //search for default device.
+            if(defaultDeviceID != null)
+            {
+                for(int i=0; i<query.count; i++)
+                {
+                    if(defaultDeviceID == query.current.uniqueID)
+                    {
+                        break;
+                    }
+                    query.Advance();
+                }
+            }
+
 
             device = query.current as CameraDevice;
             
@@ -70,8 +94,12 @@ namespace MediaPipe.FaceMesh
             var aspect2 = (float)_targetRenderTexture.width / _targetRenderTexture.height;
             var gap = aspect2 / aspect1;
 
+            if (_isMirror) gap = -gap;
+
             var scale = new Vector2(gap, 1);
             var offset = new Vector2((1 - gap) / 2, 0);
+
+            
 
             Graphics.Blit(previewTexture, _targetRenderTexture, scale, offset);
 
@@ -91,9 +119,18 @@ namespace MediaPipe.FaceMesh
             device = query.current as CameraDevice;
             previewTexture = await device.StartRunning();
 
+            //Update Json
+            _jsonSettings.UpdateSettings<string>("deviceID", query.current.uniqueID);
+
         }
 
-        #endregion
+        public void SetMirrored(bool isMirror)
+        {
+            _isMirror = isMirror;
+            _jsonSettings.UpdateSettings<bool>("isMirrored", _isMirror);
+        }
+
+#endregion
     }
 
 } // namespace MediaPipe.FaceMesh
